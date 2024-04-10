@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-import { Bot, Context } from "grammy";
+import { Context } from "grammy";
 import { PrismaClient, user } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -67,7 +67,7 @@ async function recordRatingChange(ratingChange: RatingChange, ctx: Context): Pro
         let toName = ratingChange.to.nickname || ratingChange.to.name;
 
         // Теперь сообщение об изменении рейтинга также включает текущий рейтинг
-        await ctx.reply(`${fromName} изменил рейтинг ${replyTarget} ${toName} на ${ratingEmoji} \n ${ratingMessage}`);
+        await ctx.reply(`${fromName} изменил рейтинг ${replyTarget} ${toName} ${ratingEmoji}\n${ratingMessage}`);
     } catch (error) {
         console.error(`Ошибка при записи изменения рейтинга: ${error}`);
         await ctx.reply("Произошла ошибка при попытке изменить рейтинг. Пожалуйста, попробуйте позже.");

@@ -1,13 +1,10 @@
-import {Bot, Context, InlineKeyboard, InputFile} from 'grammy';
+import {Bot, Context} from 'grammy';
 import {handleMessage} from '~/chat';
 
 require('dotenv').config();
 
 const chat_id = process.env.MAIN_CHAT_ID;
 const token = process.env.BOT_TOKEN;
-
-let isBusy = false;
-let ctxArray: any[] = [];
 
 if (!token) {
     throw new Error('Declare BOT_TOKEN in .env file in the root of the project');
