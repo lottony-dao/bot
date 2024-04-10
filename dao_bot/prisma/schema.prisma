@@ -1,0 +1,25 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+model user {
+  id             Int     @id @default(autoincrement())
+  tg_id          Int     @unique
+  name           String
+  nickname       String?
+  wallet_address String?
+}
+
+model rating_history {
+  id         Int      @id @default(autoincrement())
+  from_user  Int
+  to_user    Int
+  created_at DateTime @default(now())
+  rate_value Int
+}
