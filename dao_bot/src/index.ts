@@ -1,5 +1,6 @@
 import {Bot, Context} from 'grammy';
 import {handleMessage} from '~/chat';
+import { checkUserActivity } from './chat/public/checkUserActivity';
 
 require('dotenv').config();
 
@@ -12,7 +13,7 @@ if (!token) {
 
 const bot = new Bot(token);
 
-bot.on('message', (ctx: Context) => {
+bot.on('message', async (ctx: Context) => {
     let chat = ctx.chat || null;
 
     if (!chat) {
@@ -22,8 +23,14 @@ bot.on('message', (ctx: Context) => {
         if (ctx.message?.text) {
 
         }
-    } else {
-        chat_id && (chat.id.toString() === chat_id) && handleMessage(ctx);
+    } else if (chat_id && (chat.id.toString() === chat_id)) {
+        const activityCheck = await checkUserActivity(ctx);
+        if (!activityCheck) {
+            handleMessage(ctx);
+        }else{
+            const username = ctx.from?.username || ctx.from?.first_name || ctx.from?.id;
+            ctx.reply(`${username} - не надо жульничать, сегодня ты уже баловался этим.`);
+        }
     }
 });
 
