@@ -1,18 +1,21 @@
-import { PrismaClient } from '@prisma/client';
-import { Context } from "grammy";
+import {PrismaClient} from '@prisma/client';
+import {Context} from "grammy";
 
 const prisma = new PrismaClient();
 
 export async function checkUserActivity(ctx: Context): Promise<boolean> {
     const fromUser = ctx.message?.from;
     const toUser = ctx.message?.reply_to_message?.from;
+    const text = ctx.message?.text?.toLowerCase().trim();
 
-    if (!fromUser || !toUser) {
-        return false; // Если нет информации о пользователях
-    }else if(fromUser.id === toUser.id)
-    {
-        ctx.reply('Ты сам себе не режиссер!!!'); // Если пользователь пытается изменить свой рейтинг
+    if (text === '?rep' || text === '?реп') {
         return false;
+    } else if (!fromUser || !toUser) {
+        ctx.reply('Не нашли информацию о пользователе!!!');
+        return true; // Если нет информации о пользователях
+    } else if (fromUser.id === toUser.id) {
+        ctx.reply('Ты сам себе не режиссер!!!'); // Если пользователь пытается изменить свой рейтинг
+        return true;
     }
 
     // Формирование диапазона дат для текущего дня
@@ -33,6 +36,7 @@ export async function checkUserActivity(ctx: Context): Promise<boolean> {
             },
         },
     });
-
+    const username = ctx.from?.username || ctx.from?.first_name || ctx.from?.id;
+    ctx.reply(`${username} - не надо жульничать, сегодня ты уже баловался этим.`);
     return changesToday > 0;
 }

@@ -28,8 +28,7 @@ bot.on('message', async (ctx: Context) => {
         if (!activityCheck) {
             handleMessage(ctx);
         }else{
-            const username = ctx.from?.username || ctx.from?.first_name || ctx.from?.id;
-            ctx.reply(`${username} - не надо жульничать, сегодня ты уже баловался этим.`);
+
         }
     }
 });
