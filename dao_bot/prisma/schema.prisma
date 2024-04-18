@@ -9,12 +9,14 @@ datasource db {
 }
 
 model user {
-  id             Int     @id @default(autoincrement())
-  tg_id          Int     @unique
+  id             Int           @id @default(autoincrement())
+  tg_id          Int           @unique
   name           String
   nickname       String?
   wallet_address String?
+  achievements   achievement[] // Обратное отношение к достижениям
 }
+
 
 model rating_history {
   id         Int      @id @default(autoincrement())
@@ -23,3 +25,14 @@ model rating_history {
   created_at DateTime @default(now())
   rate_value Int
 }
+
+model achievement {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  title      String
+  created_at DateTime @default(now())
+  user       user     @relation(fields: [user_id], references: [id])
+
+  @@index([user_id])
+}
+
