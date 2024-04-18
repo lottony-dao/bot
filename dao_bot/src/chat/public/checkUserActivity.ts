@@ -7,8 +7,12 @@ export async function checkUserActivity(ctx: Context): Promise<boolean> {
     const fromUser = ctx.message?.from;
     const toUser = ctx.message?.reply_to_message?.from;
 
-    if (!fromUser || !toUser || fromUser.id === toUser.id) {
-        return false; // Если нет информации о пользователях или пользователь пытается изменить свой рейтинг
+    if (!fromUser || !toUser) {
+        return false; // Если нет информации о пользователях
+    }else if(fromUser.id === toUser.id)
+    {
+        ctx.reply('Ты сам себе не режиссер!!!'); // Если пользователь пытается изменить свой рейтинг
+        return false;
     }
 
     // Формирование диапазона дат для текущего дня
