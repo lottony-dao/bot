@@ -1,10 +1,8 @@
 import {Bot, Context} from 'grammy';
 import {handleMessage} from '~/chat';
-import { checkUserActivity } from './chat/public/checkUserActivity';
 
 require('dotenv').config();
 
-const chat_id = process.env.MAIN_CHAT_ID;
 const token = process.env.BOT_TOKEN;
 
 if (!token) {
@@ -12,6 +10,11 @@ if (!token) {
 }
 
 const bot = new Bot(token);
+
+bot.command("map", async(ctx: Context) =>{
+    await ctx.reply("Вот ссылки на .....");
+
+});
 
 bot.on('message', async (ctx: Context) => {
     let chat = ctx.chat || null;
@@ -23,11 +26,8 @@ bot.on('message', async (ctx: Context) => {
         if (ctx.message?.text) {
 
         }
-    } else if (chat_id && (chat.id.toString() === chat_id)) {
-        const activityCheck = await checkUserActivity(ctx);
-        if (!activityCheck) {
-            handleMessage(ctx);
-        }
+    } else {
+        return handleMessage(ctx);
     }
 });
 

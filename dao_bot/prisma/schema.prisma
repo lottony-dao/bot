@@ -10,29 +10,119 @@ datasource db {
 
 model user {
   id             Int           @id @default(autoincrement())
-  tg_id          Int           @unique
+  tg_id          BigInt           @unique
   name           String
   nickname       String?
   wallet_address String?
-  achievements   achievement[] // Обратное отношение к достижениям
+  level Int @default(1)
+
+  plashka   plashka[]
+  user_plashka_junction user_plashka_junction[]
+  wallet  wallet[]
+  rating_out rating_ledger[] @relation(name: "voter")
+  rating_in rating_ledger[] @relation(name: "target")
+  balance_out balance_ledger[] @relation(name: "seller")
+  balance_in balance_ledger[] @relation(name: "buyer")
+  experience_ledger experience_ledger[]
+
+  @@index([tg_id])
 }
 
-
-model rating_history {
-  id         Int      @id @default(autoincrement())
-  from_user  Int
-  to_user    Int
+model wallet {
+  id Int @id @default(autoincrement())
+  user_id Int
+  jetton_id Int
   created_at DateTime @default(now())
-  rate_value Int
+  updated_at DateTime? @default(now())
+
+  user       user     @relation(fields: [user_id], references: [id])
+  jetton jetton @relation(fields: [jetton_id], references: [id])
+
+  @@unique([user_id, jetton_id])
+  @@index([user_id])
+  @@index([jetton_id])
 }
 
-model achievement {
+model jetton {
+  id Int @id @default(autoincrement())
+  ticker String
+  address String?
+  created_at DateTime @default(now())
+
+  wallet  wallet[]
+  balance_ledger balance_ledger[]
+}
+
+model rating_ledger {
+  id         Int      @id @default(autoincrement())
+  user_id_from  Int
+  user_id_to    Int
+  value Int
+  created_at DateTime @default(now())
+
+  user_from user @relation(name: "voter", fields: [user_id_from], references: [id])
+  user_to user @relation(name: "target", fields: [user_id_to], references: [id])
+
+  @@index([user_id_from])
+  @@index([user_id_to])
+  @@index([user_id_from, user_id_to])
+  @@index([user_id_to, user_id_from])
+}
+
+model balance_ledger {
+  id         Int      @id @default(autoincrement())
+  user_id_from  Int
+  user_id_to    Int
+  jetton_id Int
+  value Int
+  created_at DateTime @default(now())
+
+  user_from user @relation(name: "seller", fields: [user_id_from], references: [id])
+  user_to user @relation(name: "buyer", fields: [user_id_to], references: [id])
+  jetton jetton @relation(fields: [jetton_id], references: [id])
+
+  @@index([user_id_from])
+  @@index([user_id_to])
+  @@index([user_id_from, user_id_to])
+  @@index([user_id_to, user_id_from])
+  @@index([jetton_id])
+}
+
+
+model experience_ledger {
   id         Int      @id @default(autoincrement())
   user_id    Int
-  title      String
+  value Int
+  source String
   created_at DateTime @default(now())
-  user       user     @relation(fields: [user_id], references: [id])
+
+  user user @relation(fields: [user_id], references: [id])
 
   @@index([user_id])
+  @@index([source])
 }
 
+model plashka {
+  id         Int      @id @default(autoincrement())
+  title      String
+  type      String
+  points  Int
+  created_at DateTime @default(now())
+
+  user user[]
+  user_plashka_junction user_plashka_junction[]
+
+  @@index([type])
+  @@index([title])
+}
+
+model user_plashka_junction {
+  user_id    Int
+  plashka_id Int
+  created_at DateTime @default(now())
+
+  user       user     @relation(fields: [user_id], references: [id])
+  plashka       plashka     @relation(fields: [plashka_id], references: [id])
+
+  @@id([user_id, plashka_id])
+}
