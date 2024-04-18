@@ -11,9 +11,11 @@ export async function checkUserActivity(ctx: Context): Promise<boolean> {
     if (text === '?rep' || text === '?реп') {
         return false;
     } else if (!fromUser || !toUser) {
-        ctx.reply('Не нашли информацию о пользователе!!!');
         return true; // Если нет информации о пользователях
-    } else if (fromUser.id === toUser.id) {
+    } else if(toUser.is_bot)
+    {
+        return true;
+    }else if (fromUser.id === toUser.id) {
         ctx.reply('Ты сам себе не режиссер!!!'); // Если пользователь пытается изменить свой рейтинг
         return true;
     }

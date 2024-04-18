@@ -27,8 +27,6 @@ bot.on('message', async (ctx: Context) => {
         const activityCheck = await checkUserActivity(ctx);
         if (!activityCheck) {
             handleMessage(ctx);
-        }else{
-
         }
     }
 });
