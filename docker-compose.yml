@@ -1,0 +1,33 @@
+version: '3.8'
+services:
+  dao_bot:
+    container_name: dao_bot
+    build:
+      context: ./
+      args:
+        - MODE=${MODE:-"prod"}
+    ports:
+      - "8080:8080" # Убедитесь, что порт соответствует тому, который используется вашим ботом
+    volumes:
+      - ./:/usr/src/app/:delegated
+      - ./node_modules:/usr/src/app/node_modules:delegated
+    depends_on:
+      - dao_db
+
+  dao_db:
+    container_name: dao_db
+    image: postgres:13
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=${PG_USER}
+      - POSTGRES_PASSWORD=${PG_PWD}
+      - POSTGRES_DB=${PG_DB}
+    volumes:
+      - dao_db_data:/var/lib/postgresql/data
+
+volumes:
+  dao_db_data:
+
+networks:
+  default:
