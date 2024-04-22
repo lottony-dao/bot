@@ -2,15 +2,15 @@ version: '3.8'
 services:
   dao_bot:
     container_name: dao_bot
-    build:
-      context: ./
-      args:
-        - MODE=${MODE:-"prod"}
+    build: .
+    command: npm run dev
     ports:
       - "8080:8080" # Убедитесь, что порт соответствует тому, который используется вашим ботом
+    environment:
+      - MODE=${MODE}
     volumes:
-      - ./:/usr/src/app/:delegated
-      - ./node_modules:/usr/src/app/node_modules:delegated
+      - .:/usr/src/app/
+      - /usr/src/app/node_modules
     depends_on:
       - dao_db
 
