@@ -3,7 +3,7 @@ import {getUserName} from "~/helpers";
 require('dotenv').config();
 
 import {Context} from "grammy";
-import {user} from '@prisma/client';
+import {user, rating_ledger} from '@prisma/client';
 import {prismaClient} from "~/db";
 import {findUserOrCreate} from "~/repositories/userRepository";
 
@@ -19,13 +19,13 @@ interface RatingChange {
 }
 
 const recordRatingChange = (ratingChange: RatingChange, ctx: Context): void => {
-    prismaClient.rating_history.findFirst({
+    prismaClient.rating_ledger.findFirst({
         where: {
-            from_user: {
-                equals: ratingChange.from.tg_id
+            user_id_from: {
+                equals: ratingChange.from.id
             },
-            to_user: {
-                equals: ratingChange.to.tg_id
+            user_id_to: {
+                equals: ratingChange.to.id
             },
             created_at: {
                 gte: new Date(new Date().setUTCHours(0, 0, 0, 0)),
@@ -33,15 +33,15 @@ const recordRatingChange = (ratingChange: RatingChange, ctx: Context): void => {
             }
         },
     })
-        .then((row) => {
+        .then((row: rating_ledger | null) => {
             if (row) {
                 ctx.reply(`Попробуй завтра, ${getUserName(ratingChange.from)}!`)
             } else {
-                prismaClient.rating_history.create({
+                prismaClient.rating_ledger.create({
                     data: {
-                        from_user: ratingChange.from.tg_id,
-                        to_user: ratingChange.to.tg_id,
-                        rate_value: ratingChange.value,
+                        user_id_from: ratingChange.from.id,
+                        user_id_to: ratingChange.to.id,
+                        value: ratingChange.value,
                     },
                 })
                     .then((res) => {
@@ -56,7 +56,7 @@ const recordRatingChange = (ratingChange: RatingChange, ctx: Context): void => {
                                 );
                             })
                     })
-                    .catch((e) => {
+                    .catch((e: any) => {
                         console.error(e);
                         ctx.reply("Произошла ошибка при попытке изменить рейтинг. Пожалуйста, попробуйте позже.");
                     })
@@ -67,21 +67,20 @@ const recordRatingChange = (ratingChange: RatingChange, ctx: Context): void => {
         })
 }
 
-// Исправленное объявление обработчика событий
 // Функция для подсчёта и вывода текущего рейтинга пользователя
 const getUserRatingMessage = (targetUser: user): Promise<string> => {
-    return prismaClient.rating_history.aggregate({
+    return prismaClient.rating_ledger.aggregate({
         _sum: {
-            rate_value: true,
+            value: true,
         },
         where: {
-            to_user: targetUser.tg_id,
+            user_id_to: targetUser.id,
         },
     })
         .then((res) => {
-            const totalRating = res._sum.rate_value || 0;
+            const totalRating = res._sum.value || 0;
             const ratingEmoji = totalRating >= 0 ? '😎' : '👎';
-            return `Рейтинг пользователя ${targetUser.nickname || targetUser.name}: ${totalRating} ${ratingEmoji}`;
+            return `Рейтинг пользователя ${targetUser.username || targetUser.name}: ${totalRating} ${ratingEmoji}`;
         })
         .catch((e) => {
             console.error(`Ошибка при подсчёте рейтинга пользователя: ${e}`);
@@ -111,53 +110,49 @@ function defaultAnswer(ctx: Context) {
 
 // Обновлённый обработчик сообщений
 export const handleMessage = async (ctx: Context) => {
-    let msg = ctx.message?.text || '',
-        fromUser = ctx.message?.from;
+    const msg = ctx.message?.text || '',
+        fromUser = ctx.message?.from,
+        targetTelegramUser = ctx.message?.reply_to_message?.from;
 
-    if (fromUser && !fromUser.is_bot) {
-        findUserOrCreate(fromUser)
-            .then((user) => {
-                if (!user) {
-                    console.error(`Пользователь ${fromUser?.id} не найден`)
-                    ctx.reply(`Пользователь не найден, странно...`)
-                } else {
-                    if (ctx.message?.reply_to_message?.from) {
-                        const targetTelegramUser = ctx.message.reply_to_message.from;
+    if (!fromUser || (ctx.message?.reply_to_message && !targetTelegramUser)) {
+        console.error(`Пользователь ${fromUser?.id} не найден`)
+        throw new Error(`Пользователь не найден, странно...`)
+    }
 
-                        findUserOrCreate(targetTelegramUser)
-                            .then((targetUser) => {
-                                if (!targetUser) {
-                                    console.error(`Пользователь ${targetTelegramUser?.id} не найден`)
-                                    ctx.reply(`Пользователь не найден, странно...`)
-                                } else {
-                                    switch (msg.toLowerCase().trim()) {
-                                        case "+rep":
-                                        case "+реп":
-                                            if (ctx.message?.reply_to_message?.from?.id != ctx.message?.from.id) {
-                                                recordRatingChange({from: user, to: targetUser, value: 1}, ctx);
-                                            }
-                                            break;
-                                        case "-rep":
-                                        case "-реп":
-                                            if (ctx.message?.reply_to_message?.from?.id != ctx.message?.from.id) {
-                                                recordRatingChange({from: user, to: targetUser, value: -1}, ctx);
-                                            }
-                                            break;
-                                    }
-                                }
-                            })
+    if (!fromUser.is_bot) {
+            findUserOrCreate(fromUser)
+                .then(async (user) => {
+                    let targetUser;
 
-                    } else {
+                    if (targetTelegramUser)
+                        targetUser = await findUserOrCreate(targetTelegramUser)
+
+                    if (targetUser) {
                         switch (msg.toLowerCase().trim()) {
-                            case "?rep":
-                            case "?реп":
-                                getUserRatingMessage(user); // Вызов функции для вывода рейтинга
+                            case "+rep":
+                            case "+реп":
+                                if (targetTelegramUser && targetTelegramUser.id != fromUser.id) {
+                                    recordRatingChange({from: user, to: targetUser, value: 1}, ctx);
+                                }
                                 break;
-                            default:
-                                defaultAnswer(ctx);
+                            case "-rep":
+                            case "-реп":
+                                if (targetTelegramUser && targetTelegramUser.id != fromUser.id) {
+                                    recordRatingChange({from: user, to: targetUser, value: -1}, ctx);
+                                }
+                                break;
                         }
                     }
-                }
-            })
-    }
+
+                    switch (msg.toLowerCase().trim()) {
+                        case "?rep":
+                        case "?реп":
+                            getUserRatingMessage(targetUser || user)
+                                .then((msg: string) => ctx.reply(msg)) // Вызов функции для вывода рейтинга
+                            break;
+                        default:
+                            defaultAnswer(ctx);
+                    }
+                })
+        }
 };

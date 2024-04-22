@@ -3,14 +3,14 @@ services:
   dao_bot:
     container_name: dao_bot
     build:
-      context: ./dao_bot
+      context: ./
       args:
-        - MODE=${MODE:-"dev"}
+        - MODE=${MODE:-"prod"}
     ports:
       - "8080:8080" # Убедитесь, что порт соответствует тому, который используется вашим ботом
     volumes:
-      - ./dao_bot:/usr/src/app/
-      - /usr/src/app/node_modules
+      - ./:/usr/src/app/:delegated
+      - ./node_modules:/usr/src/app/node_modules:delegated
     depends_on:
       - dao_db
 

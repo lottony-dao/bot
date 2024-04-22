@@ -8,7 +8,7 @@ export interface TelegramUser {
     username?: string;
 }
 
-export const findUserOrCreate = (from: TelegramUser): Promise<user | null> => {
+export const findUserOrCreate = (from: TelegramUser): Promise<user> => {
     return prismaClient.user.findUnique({
         where: {tg_id: from.id},
     })
@@ -17,12 +17,12 @@ export const findUserOrCreate = (from: TelegramUser): Promise<user | null> => {
                 data: {
                     tg_id: from.id,
                     name: from.first_name,
-                    nickname: from.username || null,
+                    username: from.username ? [from.username] : [],
                 },
             });
         })
         .catch((e) => {
             console.error(`Ошибка при поиске или создании пользователя: ${e}`);
-            return null;
+            throw new Error('Упс! Что-то пошло не так')
         })
 }

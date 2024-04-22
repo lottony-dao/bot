@@ -12,7 +12,7 @@ model user {
   id             Int           @id @default(autoincrement())
   tg_id          BigInt           @unique
   name           String
-  nickname       String?
+  username       String[] @default([])
   wallet_address String?
   level Int @default(1)
 
