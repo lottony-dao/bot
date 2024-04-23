@@ -1,5 +1,5 @@
 import {getUserName} from "~/helpers";
-import {userProfile} from "~/repositories/profileRepository";
+import {userProfile} from "~/handlers/profileHandler";
 
 require('dotenv').config();
 

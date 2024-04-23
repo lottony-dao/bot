@@ -1,5 +1,5 @@
 import {Context} from "grammy";
-import {userProfile} from "~/repositories/profileRepository";
+import {userProfile} from "~/handlers/profileHandler";
 import {ratingMessage} from "~/handlers/ratingHandler"
 
 const personalRepliesMap: { [key: number]: string } = {
