@@ -1,5 +1,4 @@
 import {Context} from "grammy";
-import {findUserOrCreate} from "~/repositories/userRepository";
 import {userProfile} from "~/repositories/profileRepository";
 import {ratingMessage} from "~/handlers/ratingHandler"
 
@@ -18,11 +17,11 @@ export const message = async (ctx: Context) => {
         case "-реп":
         case "?rep":
         case "?реп":
-            ratingMessage(ctx);
+            await ratingMessage(ctx);
             break;
         case "?profile":
         case "?профиль":
-            userProfile(ctx);
+            await userProfile(ctx);
             break;
 
         default:
