@@ -1,6 +1,4 @@
-import {prismaClient} from "~/db";
-import {user} from '@prisma/client';
-import {getUserRating} from './ratingHistoryRepository';
+import {getUserRating} from '~/handlers/ratingHandler/ratingHandler';
 import {findUserOrCreate} from "~/repositories/userRepository";
 import {Context} from "grammy";
 
@@ -25,7 +23,7 @@ export const userProfile = async (ctx: Context) => {
                 };
 
                 await ctx.reply(
-                    `Имя: ${profile.name},\n\nРейтинг: ${profile.rating},\n\nУровень: ${profile.level}`);
+                    `Имя: ${profile.name},\n\nРейтинг: ${profile.rating}`);
             } else {
                 await ctx.reply('Пользователь не найден.');
             }

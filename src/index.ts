@@ -1,5 +1,5 @@
 import {Bot, Context} from 'grammy';
-import {handleMessage} from '~/chat';
+import {message} from '~/handlers/messageHandler';
 import {mapMessage} from "~/handlers/mapHandler";
 
 require('dotenv').config();
@@ -34,7 +34,7 @@ bot.on('message', async (ctx: Context) => {
 
         }
     } else {
-        return handleMessage(ctx)
+        return message(ctx)
             .catch((e: Error) => {
                 ctx.reply(e.message)
             });

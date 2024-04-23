@@ -1,1 +1,1 @@
-export * from "./linksList";
+export * from "./mapHandler";
