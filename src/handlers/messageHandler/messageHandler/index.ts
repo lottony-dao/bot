@@ -7,21 +7,27 @@ const personalRepliesMap: { [key: number]: string } = {
     5698437506: "Fucking legend 🥶",
 };
 
+const messageFunctionMap: {[k: string]: (ctx: Context) => Promise<void>} = {
+    '+rep': ratingMessage,
+    '+реп': ratingMessage,
+    '-rep': ratingMessage,
+    '-реп': ratingMessage,
+    '?rep': ratingMessage,
+    '?реп': ratingMessage,
+    '?profile': ratingMessage,
+    '?профиль': ratingMessage,
+}
+
 export const message = async (ctx: Context) => {
     const msg = ctx.message?.text || '';
     const targetTelegramUser = ctx.message?.reply_to_message?.from;
     if(targetTelegramUser?.is_bot){
         return;
     }
+
+    await messageFunctionMap[msg.toLowerCase().trim()](ctx);
+
     switch (msg.toLowerCase().trim()) {
-        case "+rep":
-        case "+реп":
-        case "-rep":
-        case "-реп":
-        case "?rep":
-        case "?реп":
-            await ratingMessage(ctx);
-            break;
         case "?profile":
         case "?профиль":
             await userProfile(ctx);
