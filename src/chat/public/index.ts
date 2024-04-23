@@ -1,4 +1,5 @@
 import {getUserName} from "~/helpers";
+import {userProfile} from "~/repositories/profileRepository";
 
 require('dotenv').config();
 
@@ -140,6 +141,10 @@ export const handleMessage = async (ctx: Context) => {
                                 if (targetTelegramUser && targetTelegramUser.id != fromUser.id) {
                                     recordRatingChange({from: user, to: targetUser, value: -1}, ctx);
                                 }
+                                break;
+                            case "profile":
+                            case "профиль":
+                                const profile = userProfile(ctx);
                                 break;
                         }
                     }
