@@ -119,7 +119,7 @@ export const handleMessage = async (ctx: Context) => {
         throw new Error(`Пользователь не найден, странно...`)
     }
 
-    if (!fromUser.is_bot) {
+    if (!fromUser.is_bot && !targetTelegramUser?.is_bot) {
             findUserOrCreate(fromUser)
                 .then(async (user) => {
                     let targetUser;
