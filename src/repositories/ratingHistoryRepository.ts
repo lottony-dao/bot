@@ -2,16 +2,16 @@ import {prismaClient} from "~/db";
 import { user } from '@prisma/client';
 
 export const getUserRating = (tg_id: number): Promise<number | null> => {
-    return prismaClient.rating_history.aggregate({
+    return prismaClient.rating_ledger.aggregate({
         _sum: {
-            rate_value: true,
+            value: true,
         },
         where: {
-            to_user: tg_id,
+            user_id_to: tg_id,
         },
     })
         .then((res) => {
-            return res._sum.rate_value || 0
+            return res._sum.value || 0
         })
         .catch((e) => {
             console.error(e);
