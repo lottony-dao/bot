@@ -1,20 +1,22 @@
 import {prismaClient} from "~/db";
 import { user } from '@prisma/client';
 
-export const getUserRating = (tg_id: number): Promise<number | null> => {
-    return prismaClient.rating_history.aggregate({
+export const getUserRating = (targetUser: user): Promise<string> => {
+    return prismaClient.rating_ledger.aggregate({
         _sum: {
-            rate_value: true,
+            value: true,
         },
         where: {
-            to_user: tg_id,
+            user_id_to: targetUser.id,
         },
     })
         .then((res) => {
-            return res._sum.rate_value || 0
+            const totalRating = res._sum.value || 0;
+            const ratingEmoji = totalRating >= 0 ? '😎' : '👎';
+            return `Рейтинг пользователя ${targetUser.username || targetUser.name}: ${totalRating} ${ratingEmoji}`;
         })
         .catch((e) => {
-            console.error(e);
-            return null;
+            console.error(`Ошибка при подсчёте рейтинга пользователя: ${e}`);
+            return "Произошла ошибка при попытке получить рейтинг.";
         })
 }
