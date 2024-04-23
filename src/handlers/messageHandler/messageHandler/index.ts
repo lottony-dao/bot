@@ -11,7 +11,6 @@ export const message = async (ctx: Context) => {
     const msg = ctx.message?.text || '';
     const targetTelegramUser = ctx.message?.reply_to_message?.from;
     if(targetTelegramUser?.is_bot){
-        ctx.reply("У бота нету характеристик");
         return;
     }
     switch (msg.toLowerCase().trim()) {
