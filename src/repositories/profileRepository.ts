@@ -3,11 +3,13 @@ import {findUserOrCreate} from "~/repositories/userRepository";
 import {Context} from "grammy";
 
 export const userProfile = async (ctx: Context) => {
-    const telegramUser = ctx.message?.reply_to_message?.from;
+    let telegramUser = ctx.message?.reply_to_message?.from;
 
+    if(!telegramUser){
+        telegramUser = ctx.message?.from;
+    }
     if (telegramUser) {
         try {
-
             const targetUser = await findUserOrCreate({
                 id: telegramUser.id,
                 is_bot: telegramUser.is_bot,
@@ -23,7 +25,7 @@ export const userProfile = async (ctx: Context) => {
                 };
 
                 await ctx.reply(
-                    `Имя: ${profile.name},\n\nРейтинг: ${profile.rating}`);
+                    `Имя: ${profile.name},\nРейтинг: ${profile.rating}`);
             } else {
                 await ctx.reply('Пользователь не найден.');
             }
