@@ -1,16 +1,10 @@
+import {Context} from "grammy";
+import {findUserOrCreate, TelegramUser} from "~/repositories/userRepository";
+import {user, rating_ledger} from '@prisma/client';
+import {prismaClient} from "~/db";
 import {getUserName} from "~/helpers";
 
 require('dotenv').config();
-
-import {Context} from "grammy";
-import {user, rating_ledger} from '@prisma/client';
-import {prismaClient} from "~/db";
-import {findUserOrCreate} from "~/repositories/userRepository";
-
-const personalRepliesMap: { [key: number]: string } = {
-    0: "But... How? 😨",
-    5698437506: "Fucking legend 🥶",
-};
 
 interface RatingChange {
     from: user;
@@ -67,8 +61,7 @@ const recordRatingChange = (ratingChange: RatingChange, ctx: Context): void => {
         })
 }
 
-// Функция для подсчёта и вывода текущего рейтинга пользователя
-const getUserRatingMessage = (targetUser: user): Promise<string> => {
+export const getUserRating = (targetUser: user): Promise<number | null> => {
     return prismaClient.rating_ledger.aggregate({
         _sum: {
             value: true,
@@ -77,39 +70,35 @@ const getUserRatingMessage = (targetUser: user): Promise<string> => {
             user_id_to: targetUser.id,
         },
     })
-        .then((res) => {
+        .then((res): number => {
             const totalRating = res._sum.value || 0;
-            const ratingEmoji = totalRating >= 0 ? '😎' : '👎';
-            return `Рейтинг пользователя ${targetUser.username || targetUser.name}: ${totalRating} ${ratingEmoji}`;
+            return totalRating;
         })
         .catch((e) => {
             console.error(`Ошибка при подсчёте рейтинга пользователя: ${e}`);
-            return "Произошла ошибка при попытке получить рейтинг.";
-        })
+            // Возвращает null в случае ошибки, согласно измененному типу функции
+            return null;
+        });
 }
 
-function defaultAnswer(ctx: Context) {
-    let id = ctx.message?.from.id || 0,
-        text = personalRepliesMap[id] || '',
-        max = 1000,
-        min = 1,
-        rand = Math.floor(
-            Math.random() * (max - min + 1) + min
-        );
-
-    if (rand === 69 && text) {
-        if (ctx.message?.message_id) {
-            ctx.reply(text, {
-                reply_parameters: {message_id: ctx.message?.message_id},
-            });
+const getUserRatingMessage = async (targetUser: user): Promise<string> => {
+    const userName = targetUser.username || targetUser.name || `#${targetUser.tg_id}`;
+    try {
+        const rating = await getUserRating(targetUser);
+        if (rating === null) {
+            console.error(`Ошибка при подсчёте рейтинга пользователя: ${userName}`);
+            return "Не удалось получить рейтинг пользователя из-за ошибки.";
         } else {
-            ctx.reply(text);
+            const ratingEmoji = rating >= 0 ? '😎' : '👎';
+            return `Рейтинг пользователя ${userName}: ${rating} ${ratingEmoji}`;
         }
+    } catch (error) {
+        console.error(`Ошибка при подсчёте рейтинга пользователя: ${error}`);
+        return "Произошла ошибка при попытке получить рейтинг.";
     }
 }
 
-// Обновлённый обработчик сообщений
-export const handleMessage = async (ctx: Context) => {
+export const ratingMessage = async (ctx: Context) => {
     const msg = ctx.message?.text || '',
         fromUser = ctx.message?.from,
         targetTelegramUser = ctx.message?.reply_to_message?.from;
@@ -120,39 +109,37 @@ export const handleMessage = async (ctx: Context) => {
     }
 
     if (!fromUser.is_bot) {
-            findUserOrCreate(fromUser)
-                .then(async (user) => {
-                    let targetUser;
+        findUserOrCreate(fromUser)
+            .then(async (user) => {
+                let targetUser;
 
-                    if (targetTelegramUser)
-                        targetUser = await findUserOrCreate(targetTelegramUser)
+                if (targetTelegramUser)
+                    targetUser = await findUserOrCreate(targetTelegramUser)
 
-                    if (targetUser) {
-                        switch (msg.toLowerCase().trim()) {
-                            case "+rep":
-                            case "+реп":
-                                if (targetTelegramUser && targetTelegramUser.id != fromUser.id) {
-                                    recordRatingChange({from: user, to: targetUser, value: 1}, ctx);
-                                }
-                                break;
-                            case "-rep":
-                            case "-реп":
-                                if (targetTelegramUser && targetTelegramUser.id != fromUser.id) {
-                                    recordRatingChange({from: user, to: targetUser, value: -1}, ctx);
-                                }
-                                break;
-                        }
-                    }
-
+                if (targetUser) {
                     switch (msg.toLowerCase().trim()) {
-                        case "?rep":
-                        case "?реп":
-                            getUserRatingMessage(targetUser || user)
-                                .then((msg: string) => ctx.reply(msg)) // Вызов функции для вывода рейтинга
+                        case "+rep":
+                        case "+реп":
+                            if (targetTelegramUser && targetTelegramUser.id != fromUser.id) {
+                                recordRatingChange({from: user, to: targetUser, value: 1}, ctx);
+                            }
                             break;
-                        default:
-                            defaultAnswer(ctx);
+                        case "-rep":
+                        case "-реп":
+                            if (targetTelegramUser && targetTelegramUser.id != fromUser.id) {
+                                recordRatingChange({from: user, to: targetUser, value: -1}, ctx);
+                            }
+                            break;
                     }
-                })
-        }
+                }
+
+                switch (msg.toLowerCase().trim()) {
+                    case "?rep":
+                    case "?реп":
+                        getUserRatingMessage(targetUser || user)
+                            .then((msg: string) => ctx.reply(msg)) // Вызов функции для вывода рейтинга
+                        break;
+                }
+            })
+    }
 };
