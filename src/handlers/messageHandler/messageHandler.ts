@@ -1,6 +1,6 @@
 import {Context} from "grammy";
-import {userProfile} from "~/handlers/profileHandler";
-import {ratingMessage} from "~/handlers/ratingHandler"
+import {userProfile} from "~/repositories/profileRepository";
+import {ratingMessage} from "~/repositories/ratingRepository"
 
 const personalRepliesMap: { [key: number]: string } = {
     0: "But... How? 😨",

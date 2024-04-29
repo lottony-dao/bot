@@ -2,7 +2,7 @@ import {Context} from "grammy";
 import {findUserOrCreate, TelegramUser} from "~/repositories/userRepository";
 import {user, rating_ledger} from '@prisma/client';
 import {prismaClient} from "~/db";
-import {getUserName} from "~/helpers";
+import {getUserName} from "~/helpers/userHelper";
 
 require('dotenv').config();
 

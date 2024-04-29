@@ -1,4 +1,4 @@
-import {getUserRating} from '~/handlers/ratingHandler/ratingHandler';
+import {getUserRating} from '~/repositories/ratingRepository/ratingRepository';
 import {findUserOrCreate} from "~/repositories/userRepository";
 import {Context} from "grammy";
 
