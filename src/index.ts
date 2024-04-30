@@ -20,7 +20,7 @@ const LottonyLinksList = {
         site_dao: 'https://dao.lottony.win/',
         lottony_dao: 'http://t.me/lottony_dao',
         lottony_chat: 'http://t.me/lottony_chat',
-        lottony_art: 'http://t.me/lottony_arts',
+        lottony_art: 'http://t.me/lottony_art',
         lottony_feed: 'https://t.me/lottony_feed',
         lottony_legends: 'https://t.me/lottony_legends',
         lottony_hate: 'https://t.me/lottony_hate',
