@@ -46,4 +46,3 @@ export const message = async (ctx: Context) => {
             defaultAnswer(ctx);
     }
 };
-
