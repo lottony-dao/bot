@@ -1,22 +1,31 @@
 import {Context} from "grammy";
 import {userProfile} from "~/repositories/profileRepository";
-import {ratingMessage} from "~/repositories/ratingRepository"
+import {messageFunctionMap} from "~/dictionaries/messageFunctionDictionary"
+
+function defaultAnswer(ctx: Context) {
+    let id = ctx.message?.from.id || 0,
+        text = personalRepliesMap[id] || '',
+        max = 1000,
+        min = 1,
+        rand = Math.floor(
+            Math.random() * (max - min + 1) + min
+        );
+
+    if (rand === 69 && text) {
+        if (ctx.message?.message_id) {
+            ctx.reply(text, {
+                reply_parameters: {message_id: ctx.message?.message_id},
+            });
+        } else {
+            ctx.reply(text);
+        }
+    }
+}
 
 const personalRepliesMap: { [key: number]: string } = {
     0: "But... How? 😨",
     5698437506: "Fucking legend 🥶",
 };
-
-const messageFunctionMap: {[k: string]: (ctx: Context) => Promise<void>} = {
-    '+rep': ratingMessage,
-    '+реп': ratingMessage,
-    '-rep': ratingMessage,
-    '-реп': ratingMessage,
-    '?rep': ratingMessage,
-    '?реп': ratingMessage,
-    '?profile': ratingMessage,
-    '?профиль': ratingMessage,
-}
 
 export const message = async (ctx: Context) => {
     const msg = ctx.message?.text || '';
@@ -38,22 +47,3 @@ export const message = async (ctx: Context) => {
     }
 };
 
-function defaultAnswer(ctx: Context) {
-    let id = ctx.message?.from.id || 0,
-        text = personalRepliesMap[id] || '',
-        max = 1000,
-        min = 1,
-        rand = Math.floor(
-            Math.random() * (max - min + 1) + min
-        );
-
-    if (rand === 69 && text) {
-        if (ctx.message?.message_id) {
-            ctx.reply(text, {
-                reply_parameters: {message_id: ctx.message?.message_id},
-            });
-        } else {
-            ctx.reply(text);
-        }
-    }
-}
