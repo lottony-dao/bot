@@ -18,9 +18,10 @@ bot.api.setMyCommands([
 const LottonyLinksList = {
         //Lottony DAO
         site_dao: 'https://dao.lottony.win/',
-        lottony_dao: 'http://t.me/lottony_dao',
-        lottony_chat: 'http://t.me/lottony_chat',
-        lottony_art: 'http://t.me/lottony_art',
+        lottony_dao: 'https://t.me/lottony_dao',
+        lottony_chat: 'https://t.me/lottony_chat',
+        lottony_dao_decisions: 'https://t.me/lottony_dao_decisions',
+        lottony_art: 'https://t.me/lottony_art',
         lottony_feed: 'https://t.me/lottony_feed',
         lottony_legends: 'https://t.me/lottony_legends',
         lottony_hate: 'https://t.me/lottony_hate',
@@ -40,6 +41,7 @@ const LottonyLinksList = {
             `- [Канал](${LottonyLinksList.lottony_dao})\n` +
             `- [Чат](${LottonyLinksList.lottony_chat})\n` +
             `- [Картинная галерея](${LottonyLinksList.lottony_art})\n` +
+            `- [Летопись решений Совета Мудрейших](${LottonyLinksList.lottony_dao_decisions})\n` +
             `- [Книга легенд](${LottonyLinksList.lottony_legends})\n` +
             `- [Новостная лента](${LottonyLinksList.lottony_feed})\n` +
             `- [Клуб Бубликов](${LottonyLinksList.lottony_hate})\n` +
