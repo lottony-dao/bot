@@ -16,12 +16,14 @@ bot.api.setMyCommands([
     {command: 'map', description: 'Карта Лисьей Деревни'},
 ]);
 
-bot.command("map", (ctx: Context) => {
+function replyMap(ctx: Context) {
     ctx.reply(mapMessage, {
         parse_mode: "Markdown",
-        link_preview_options: {is_disabled: true},
+        link_preview_options: { is_disabled: true },
     });
-});
+}
+
+bot.command("map", replyMap);
 
 bot.on('message', async (ctx: Context) => {
     let chat = ctx.chat || null;

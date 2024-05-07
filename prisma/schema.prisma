@@ -15,14 +15,12 @@ model user {
   username       String[] @default([])
   wallet_address String?
   level Int @default(1)
-
   plashka   plashka[]
   user_plashka_junction user_plashka_junction[]
   wallet  wallet[]
   rating_out rating_ledger[] @relation(name: "voter")
   rating_in rating_ledger[] @relation(name: "target")
-  balance_out balance_ledger[] @relation(name: "seller")
-  balance_in balance_ledger[] @relation(name: "buyer")
+
   experience_ledger experience_ledger[]
 
   @@index([tg_id])
@@ -34,7 +32,8 @@ model wallet {
   jetton_id Int
   created_at DateTime @default(now())
   updated_at DateTime? @default(now())
-
+  balance_out balance_ledger[] @relation(name: "seller")
+  balance_in balance_ledger[] @relation(name: "buyer")
   user       user     @relation(fields: [user_id], references: [id])
   jetton jetton @relation(fields: [jetton_id], references: [id])
 
@@ -71,20 +70,20 @@ model rating_ledger {
 
 model balance_ledger {
   id         Int      @id @default(autoincrement())
-  user_id_from  Int
-  user_id_to    Int
+  wallet_id_from  Int
+  wallet_id_to    Int
   jetton_id Int
   value Int
   created_at DateTime @default(now())
 
-  user_from user @relation(name: "seller", fields: [user_id_from], references: [id])
-  user_to user @relation(name: "buyer", fields: [user_id_to], references: [id])
+  wallet_from wallet @relation(name: "seller", fields: [wallet_id_from], references: [id])
+  wallet_to wallet @relation(name: "buyer", fields: [wallet_id_to], references: [id])
   jetton jetton @relation(fields: [jetton_id], references: [id])
 
-  @@index([user_id_from])
-  @@index([user_id_to])
-  @@index([user_id_from, user_id_to])
-  @@index([user_id_to, user_id_from])
+  @@index([wallet_id_from])
+  @@index([wallet_id_to])
+  @@index([wallet_id_from, wallet_id_to])
+  @@index([wallet_id_to, wallet_id_from])
   @@index([jetton_id])
 }
 
