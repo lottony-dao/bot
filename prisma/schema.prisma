@@ -8,20 +8,29 @@ datasource db {
   url      = env("DB_URL")
 }
 
-model user {
-  id             Int           @id @default(autoincrement())
-  tg_id          BigInt           @unique
-  name           String
-  username       String[] @default([])
-  wallet_address String?
-  level Int @default(1)
-  plashka   plashka[]
-  user_plashka_junction user_plashka_junction[]
-  wallet  wallet[]
-  rating_out rating_ledger[] @relation(name: "voter")
-  rating_in rating_ledger[] @relation(name: "target")
+model user_type {
+  id   Int    @id @default(autoincrement())
+  type String @unique
 
+  users user[]
+}
+
+model user {
+  id               Int            @id @default(autoincrement())
+  tg_id            BigInt?        @unique
+  name             String
+  username         String[]       @default([])
+  wallet_address   String?
+  level            Int            @default(1)
+  plashka          plashka[]
+  user_plashka_junction user_plashka_junction[]
+  wallet           wallet[]
+  rating_out       rating_ledger[] @relation(name: "voter")
+  rating_in        rating_ledger[] @relation(name: "target")
   experience_ledger experience_ledger[]
+
+  user_type_id     Int?
+  user_type        user_type?     @relation(fields: [user_type_id], references: [id])
 
   @@index([tg_id])
 }
@@ -86,7 +95,6 @@ model balance_ledger {
   @@index([wallet_id_to, wallet_id_from])
   @@index([jetton_id])
 }
-
 
 model experience_ledger {
   id         Int      @id @default(autoincrement())
