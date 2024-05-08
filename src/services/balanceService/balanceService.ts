@@ -1,27 +1,38 @@
-import { PrismaClient } from '@prisma/client';
+import {PrismaClient} from '@prisma/client';
 import {Context} from "grammy";
 import {getTokenIdByName} from "~/services/tokenService/tokenService";
 import {getWalletIdByUserId} from "~/services/walletService";
 
 const prisma = new PrismaClient();
 
-// Функция для разбора сообщения и вызова функции перевода
-export const parseTransfer = async (ctx: Context) => {
+export const tokenTransferMessage = async (ctx: Context) => {
     const text = ctx.message?.text;
     if (!text) return;
 
-    const parts = text.match(/^(\d+) (\w+)$/);
+    // Проверка наличия данных о пользователе
+    if (!ctx.from) {
+        ctx.reply("Не удается идентифицировать пользователя.");
+        return;
+    }
+
+    const parts = text.match(/^(\d+)(\w+)$/);
     if (parts) {
         const amount = parseInt(parts[1]);
         const tokenName = parts[2];
-        const tokenId = getTokenIdByName(tokenName);      // Пример, вам нужно будет определить ID на основе jettonName
-
-        // Допустим, что fromWalletId и toWalletId вы получаете каким-то образом
-        const fromWalletId = getWalletIdByUserId(1, await tokenId);
-        const toWalletId = getWalletIdByUserId(1, await tokenId);
-        transferCommand(ctx, await fromWalletId, await toWalletId, await tokenId, amount);
+        try {
+            const tokenId = await getTokenIdByName(tokenName);
+            const fromWalletId = await getWalletIdByUserId(ctx.from.id, tokenId);
+            const toWalletId = await getWalletIdByUserId(ctx.message.reply_to_message?.from?.id, tokenId);
+            await transferCommand(ctx, fromWalletId, toWalletId, tokenId, amount);
+        } catch (error) {
+            if (error instanceof Error) {
+                ctx.reply(`Ошибка: ${error.message}`);
+            } else {
+                console.log('Произошла ошибка, но она не типа Error');
+            }
+        }
     } else {
-        ctx.reply("Пожалуйста, отправьте сообщение в формате 'количество название_жетона'. Пример: '20 Ton'");
+        ctx.reply("Пожалуйста, отправьте сообщение в формате 'количество название_жетона'. Пример: '20 BTC'");
     }
 };
 

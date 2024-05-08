@@ -1,1 +1,1 @@
-export {parseTransfer} from "~/services/balanceService/balanceService";
+export {tokenTransferMessage} from "~/services/balanceService/balanceService";

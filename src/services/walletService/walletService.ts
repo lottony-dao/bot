@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export const getWalletIdByUserId = async (userId: number, tokenId: number): Promise<number> => {
+export const getWalletIdByUserId = async (userId: number|undefined, tokenId: number): Promise<number> => {
     // Получаем первый кошелек пользователя
     const wallet = await prisma.wallet.findFirst({
         where: {

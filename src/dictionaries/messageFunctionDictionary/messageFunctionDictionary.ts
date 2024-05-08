@@ -1,6 +1,6 @@
 import {Context} from "grammy";
 import {ratingMessage} from "~/repositories/ratingRepository"
-import {parseTransfer} from "~/services/balanceService"
+import {tokenTransferMessage} from "~/services/balanceService"
 
 export const messageFunctionMap: {[k: string]: (ctx: Context) => Promise<void>} = {
     '+rep': ratingMessage,
@@ -11,5 +11,5 @@ export const messageFunctionMap: {[k: string]: (ctx: Context) => Promise<void>} 
     '?реп': ratingMessage,
     '?profile': ratingMessage,
     '?профиль': ratingMessage,
-    'transfer (.*)': parseTransfer,
+    'send (.*)': tokenTransferMessage,
 }
