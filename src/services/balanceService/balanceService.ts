@@ -1,11 +1,11 @@
 import {PrismaClient} from '@prisma/client';
 import {Context} from "grammy";
-import {getTokenIdByName} from "~/services/tokenService/tokenService";
+import {getJettonIdByName} from "~/services/tokenService/tokenService";
 import {getWalletIdByUserId} from "~/services/walletService";
 
 const prisma = new PrismaClient();
 
-export const tokenTransferMessage = async (ctx: Context) => {
+export const jettonTransferMessage = async (ctx: Context) => {
     const text = ctx.message?.text;
     if (!text) return;
 
@@ -18,21 +18,21 @@ export const tokenTransferMessage = async (ctx: Context) => {
     const parts = text.match(/^(\d+)(\w+)$/);
     if (parts) {
         const amount = parseInt(parts[1]);
-        const tokenName = parts[2];
+        const jettonName = parts[2];
         try {
-            const tokenId = await getTokenIdByName(tokenName);
-            const fromWalletId = await getWalletIdByUserId(ctx.from.id, tokenId);
-            const toWalletId = await getWalletIdByUserId(ctx.message.reply_to_message?.from?.id, tokenId);
-            await transferCommand(ctx, fromWalletId, toWalletId, tokenId, amount);
+            const jettonId = await getJettonIdByName(jettonName);
+            const fromWalletId = await getWalletIdByUserId(ctx.from.id, jettonId);
+            const toWalletId = await getWalletIdByUserId(ctx.message.reply_to_message?.from?.id, jettonId);
+            await transferCommand(ctx, fromWalletId, toWalletId, jettonId, amount);
         } catch (error) {
             if (error instanceof Error) {
-                ctx.reply(`Ошибка: ${error.message}`);
+                console.error(`Ошибка: ${error.message}`);
             } else {
-                console.log('Произошла ошибка, но она не типа Error');
+                console.error('Произошла ошибка, но она не типа Error');
             }
         }
     } else {
-        ctx.reply("Пожалуйста, отправьте сообщение в формате 'количество название_жетона'. Пример: '20 BTC'");
+        // ctx.reply("Пожалуйста, отправьте сообщение в формате 'количество название_жетона'. Пример: '20 BTC'");
     }
 };
 
@@ -48,7 +48,7 @@ export const transferCommand = async (ctx: Context, fromWalletId: number, toWall
 export const transferTokens = async (
     fromWalletId: number,
     toWalletId: number,
-    token_Id: number,
+    jetton_id: number,
     amount: number
 ): Promise<any> => {
     // Транзакция для создания записей о переводе жетонов
@@ -57,7 +57,7 @@ export const transferTokens = async (
             data: {
                 wallet_id_from: fromWalletId,
                 wallet_id_to: toWalletId,
-                jetton_id: token_Id,
+                jetton_id: jetton_id,
                 value: amount,
                 created_at: new Date()
             }

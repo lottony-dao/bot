@@ -1,1 +1,1 @@
-export {tokenTransferMessage} from "~/services/balanceService/balanceService";
+export {jettonTransferMessage} from "~/services/balanceService/balanceService";

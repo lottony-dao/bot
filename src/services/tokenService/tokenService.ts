@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export const getTokenIdByName = async (tokenName: string): Promise<number> => {
+export const getJettonIdByName = async (tokenName: string): Promise<number> => {
     // Получаем первый жетон пользователя
     const jetton = await prisma.jetton.findFirst({
         where: {

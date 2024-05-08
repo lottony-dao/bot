@@ -1,6 +1,6 @@
 import {Bot, Context} from 'grammy';
-import {message} from '~/handlers/messageHandler';
-import {mapMessage} from "src/handlers/mapHandler";
+import {message} from '~/packages/messageHandler';
+import {mapMessage} from "~/packages/mapHandler";
 
 require('dotenv').config();
 
