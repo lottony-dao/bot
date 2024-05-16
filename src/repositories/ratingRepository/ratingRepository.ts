@@ -1,7 +1,7 @@
 import { Context } from "grammy";
-import { findUserOrCreate} from "~/repositories/userRepository";
+import { findUserOrCreate} from "src/repositories/accountRepository";
 import { account, PrismaClient } from '@prisma/client';
-import {getUserName} from "~/helpers/userHelper";
+import {getUserName} from "src/helpers/accountHelper";
 
 const prismaClient = new PrismaClient();
 

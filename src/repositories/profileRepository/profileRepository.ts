@@ -1,5 +1,5 @@
 import {getUserRating} from '~/repositories/ratingRepository/ratingRepository';
-import {findUserOrCreate} from "~/repositories/userRepository";
+import {findUserOrCreate} from "src/repositories/accountRepository";
 import {Context} from "grammy";
 
 export const userProfile = async (ctx: Context) => {
