@@ -1,4 +1,4 @@
-import { user } from '@prisma/client';
+import { account } from '@prisma/client';
 import { prismaClient } from '~/db';
 
 export interface TelegramUser {
@@ -13,9 +13,9 @@ export interface TelegramUser {
  * @param from - данные пользователя Telegram.
  * @returns Объект пользователя или null, если пользователь не найден.
  */
-export const findUser = async (from: TelegramUser): Promise<user | null> => {
+export const findUser = async (from: TelegramUser): Promise<account | null> => {
     try {
-        const foundUser = await prismaClient.user.findUnique({
+        const foundUser = await prismaClient.account.findUnique({
             where: { tg_id: from.id },
         });
         return foundUser;
@@ -30,9 +30,9 @@ export const findUser = async (from: TelegramUser): Promise<user | null> => {
  * @param from - данные пользователя Telegram.
  * @returns Новосозданный объект пользователя.
  */
-export const createUser = async (from: TelegramUser): Promise<user> => {
+export const createUser = async (from: TelegramUser): Promise<account> => {
     try {
-        const newUser = await prismaClient.user.create({
+        const newUser = await prismaClient.account.create({
             data: {
                 tg_id: from.id,
                 name: from.first_name,
@@ -51,7 +51,7 @@ export const createUser = async (from: TelegramUser): Promise<user> => {
  * @param from - данные пользователя Telegram.
  * @returns Объект пользователя.
  */
-export const findUserOrCreate = async (from: TelegramUser): Promise<user> => {
+export const findUserOrCreate = async (from: TelegramUser): Promise<account> => {
     const existingUser = await findUser(from);
     if (existingUser) {
         return existingUser;

@@ -1,21 +1,21 @@
 import { Context } from "grammy";
 import { findUserOrCreate} from "~/repositories/userRepository";
-import { user, PrismaClient } from '@prisma/client';
+import { account, PrismaClient } from '@prisma/client';
 import {getUserName} from "~/helpers/userHelper";
 
 const prismaClient = new PrismaClient();
 
 interface RatingChange {
-    from: user;
-    to: user;
+    from: account;
+    to: account;
     value: number;
 }
 
 const recordRatingChange = async (ratingChange: RatingChange, ctx: Context): Promise<void> => {
     const row = await prismaClient.rating_ledger.findFirst({
         where: {
-            user_id_from: ratingChange.from.id,
-            user_id_to: ratingChange.to.id,
+            account_id_from: ratingChange.from.id,
+            account_id_to: ratingChange.to.id,
             created_at: {
                 gte: new Date(new Date().setUTCHours(0, 0, 0, 0)),
                 lt: new Date(new Date().setUTCHours(24, 0, 0, 0))
@@ -29,8 +29,8 @@ const recordRatingChange = async (ratingChange: RatingChange, ctx: Context): Pro
         try {
             await prismaClient.rating_ledger.create({
                 data: {
-                    user_id_from: ratingChange.from.id,
-                    user_id_to: ratingChange.to.id,
+                    account_id_from: ratingChange.from.id,
+                    account_id_to: ratingChange.to.id,
                     value: ratingChange.value,
                 },
             });
@@ -45,13 +45,13 @@ const recordRatingChange = async (ratingChange: RatingChange, ctx: Context): Pro
     }
 };
 
-export const getUserRating = (targetUser: user): Promise<number | null> => {
+export const getUserRating = (targetUser: account): Promise<number | null> => {
     return prismaClient.rating_ledger.aggregate({
         _sum: {
             value: true,
         },
         where: {
-            user_id_to: targetUser.id,
+            account_id_to: targetUser.id,
         },
     })
         .then((res): number => {
@@ -64,7 +64,7 @@ export const getUserRating = (targetUser: user): Promise<number | null> => {
         });
 }
 
-const getUserRatingMessage = async (targetUser: user): Promise<string> => {
+const getUserRatingMessage = async (targetUser: account): Promise<string> => {
     const userName = targetUser.username || targetUser.name || `#${targetUser.tg_id}`;
     try {
         const rating = await getUserRating(targetUser);

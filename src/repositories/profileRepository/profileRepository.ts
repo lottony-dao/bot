@@ -21,7 +21,6 @@ export const userProfile = async (ctx: Context) => {
                 const profile = {
                     name: targetUser.username || targetUser.name || `#${targetUser.id}`,
                     rating: await getUserRating(targetUser),
-                    level: targetUser.level,
                 };
 
                 await ctx.reply(

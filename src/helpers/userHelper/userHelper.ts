@@ -1,5 +1,5 @@
-import { user } from '@prisma/client';
+import { account } from '@prisma/client';
 
-export const getUserName = (user: user): string => {
-    return user.username[0] || user.name || `#${user.tg_id}`;
+export const getUserName = (account: account): string => {
+    return account.username[0] || account.name || `#${account.tg_id}`;
 }
