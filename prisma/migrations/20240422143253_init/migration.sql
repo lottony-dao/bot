@@ -1,94 +1,94 @@
 -- CreateTable
 CREATE TABLE "user" (
-                        "id" SERIAL NOT NULL,
-                        "tg_id" BIGINT NOT NULL,
-                        "name" TEXT NOT NULL,
-                        "username" TEXT[] DEFAULT ARRAY[]::TEXT[],
-                        "wallet_address" TEXT,
-                        "level" INTEGER NOT NULL DEFAULT 1,
+    "id" SERIAL NOT NULL,
+    "tg_id" BIGINT NOT NULL,
+    "name" TEXT NOT NULL,
+    "username" TEXT[] DEFAULT ARRAY[]::TEXT[],
+    "wallet_address" TEXT,
+    "level" INTEGER NOT NULL DEFAULT 1,
 
-                        CONSTRAINT "user_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "user_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "wallet" (
-                          "id" SERIAL NOT NULL,
-                          "user_id" INTEGER NOT NULL,
-                          "jetton_id" INTEGER NOT NULL,
-                          "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-                          "updated_at" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
+    "id" SERIAL NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "jetton_id" INTEGER NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) DEFAULT CURRENT_TIMESTAMP,
 
-                          CONSTRAINT "wallet_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "wallet_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "jetton" (
-                          "id" SERIAL NOT NULL,
-                          "ticker" TEXT NOT NULL,
-                          "address" TEXT,
-                          "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "id" SERIAL NOT NULL,
+    "ticker" TEXT NOT NULL,
+    "address" TEXT,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-                          CONSTRAINT "jetton_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "jetton_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "rating_ledger" (
-                                 "id" SERIAL NOT NULL,
-                                 "user_id_from" INTEGER NOT NULL,
-                                 "user_id_to" INTEGER NOT NULL,
-                                 "value" INTEGER NOT NULL,
-                                 "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "id" SERIAL NOT NULL,
+    "user_id_from" INTEGER NOT NULL,
+    "user_id_to" INTEGER NOT NULL,
+    "value" INTEGER NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-                                 CONSTRAINT "rating_ledger_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "rating_ledger_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "balance_ledger" (
-                                  "id" SERIAL NOT NULL,
-                                  "user_id_from" INTEGER NOT NULL,
-                                  "user_id_to" INTEGER NOT NULL,
-                                  "jetton_id" INTEGER NOT NULL,
-                                  "value" INTEGER NOT NULL,
-                                  "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "id" SERIAL NOT NULL,
+    "user_id_from" INTEGER NOT NULL,
+    "user_id_to" INTEGER NOT NULL,
+    "jetton_id" INTEGER NOT NULL,
+    "value" INTEGER NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-                                  CONSTRAINT "balance_ledger_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "balance_ledger_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "experience_ledger" (
-                                     "id" SERIAL NOT NULL,
-                                     "user_id" INTEGER NOT NULL,
-                                     "value" INTEGER NOT NULL,
-                                     "source" TEXT NOT NULL,
-                                     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "id" SERIAL NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "value" INTEGER NOT NULL,
+    "source" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-                                     CONSTRAINT "experience_ledger_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "experience_ledger_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "plashka" (
-                           "id" SERIAL NOT NULL,
-                           "title" TEXT NOT NULL,
-                           "type" TEXT NOT NULL,
-                           "points" INTEGER NOT NULL,
-                           "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "id" SERIAL NOT NULL,
+    "title" TEXT NOT NULL,
+    "type" TEXT NOT NULL,
+    "points" INTEGER NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-                           CONSTRAINT "plashka_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "plashka_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "user_plashka_junction" (
-                                         "user_id" INTEGER NOT NULL,
-                                         "plashka_id" INTEGER NOT NULL,
-                                         "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "user_id" INTEGER NOT NULL,
+    "plashka_id" INTEGER NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-                                         CONSTRAINT "user_plashka_junction_pkey" PRIMARY KEY ("user_id","plashka_id")
+    CONSTRAINT "user_plashka_junction_pkey" PRIMARY KEY ("user_id","plashka_id")
 );
 
 -- CreateTable
 CREATE TABLE "_plashkaTouser" (
-                                  "A" INTEGER NOT NULL,
-                                  "B" INTEGER NOT NULL
+    "A" INTEGER NOT NULL,
+    "B" INTEGER NOT NULL
 );
 
 -- CreateIndex
