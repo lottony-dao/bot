@@ -15,36 +15,8 @@ model account {
   username   String[]
   created_at DateTime
 
-  rating_out       rating_ledger[]     @relation(name: "from")
-  rating_in        rating_ledger[]     @relation(name: "to")
-  wallets          wallet[]
-  experiences      experience_ledger[]
-  plashkaToaccount plashkaToaccount[]
-}
-
-model wallet {
-  id            Int      @id @default(autoincrement())
-  account_id    Int
-  address       String
-  created_at    DateTime @default(now())
-  blockchain_id Int
-
-  account             account          @relation(fields: [account_id], references: [id])
-  blockchain          blockchain       @relation(fields: [blockchain_id], references: [id])
-  balance_ledger_from balance_ledger[] @relation("from_wallet")
-  balance_ledger_to   balance_ledger[] @relation("to_wallet")
-}
-
-model jetton {
-  id             Int              @id @default(autoincrement())
-  ticker         String
-  address        String?
-  cents          Int
-  mineable       Boolean          @default(false)
-  created_at     DateTime         @default(now())
-  updated_at     DateTime         @default(now())
-  blockchains    blockchain[]
-  balance_ledger balance_ledger[]
+  rating_out rating_ledger[] @relation(name: "from")
+  rating_in  rating_ledger[] @relation(name: "to")
 }
 
 model rating_ledger {
@@ -56,59 +28,4 @@ model rating_ledger {
 
   account_from account @relation(name: "from", fields: [account_id_from], references: [id])
   account_to   account @relation(name: "to", fields: [account_id_to], references: [id])
-}
-
-model balance_ledger {
-  id             Int      @id @default(autoincrement())
-  wallet_id_from Int
-  wallet_id_to   Int
-  jetton_id      Int
-  amount         Int
-  created_at     DateTime @default(now())
-
-  wallet_from wallet @relation(name: "from_wallet", fields: [wallet_id_from], references: [id])
-  wallet_to   wallet @relation(name: "to_wallet", fields: [wallet_id_to], references: [id])
-  jetton      jetton @relation(fields: [jetton_id], references: [id])
-}
-
-model experience_ledger {
-  id         Int      @id @default(autoincrement())
-  account_id Int
-  value      Int
-  source     String
-  created_at DateTime @default(now())
-
-  account account @relation(fields: [account_id], references: [id])
-}
-
-model plashka {
-  id         Int      @id @default(autoincrement())
-  title      String
-  type       String
-  points     Int
-  created_at DateTime @default(now())
-
-  plashkaToaccount plashkaToaccount[]
-}
-
-model plashkaToaccount {
-  id         Int      @id @default(autoincrement())
-  A          Int
-  B          Int
-  created_at DateTime @default(now())
-
-  plashka plashka @relation(fields: [A], references: [id])
-  account account @relation(fields: [B], references: [id])
-}
-
-model blockchain {
-  id               Int      @id @default(autoincrement())
-  name             String
-  native_jetton_id Int
-  created_at       DateTime @default(now())
-  updated_at       DateTime @default(now())
-  is_virtual       Boolean
-
-  jetton jetton   @relation(fields: [native_jetton_id], references: [id])
-  wallet wallet[]
 }
