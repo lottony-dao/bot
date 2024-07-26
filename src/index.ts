@@ -1,9 +1,14 @@
 import {Bot, Context} from 'grammy';
 import {handleMessage} from '~/chat';
+import { ignoreOld, sequentialize } from "grammy-middlewares";
+import { autoRetry } from "@grammyjs/auto-retry";
+import { limit } from "@grammyjs/ratelimiter";
+import process from "node:process";
 
 require('dotenv').config();
 
 const token = process.env.BOT_TOKEN;
+const logsChatId = process.env.LOGS_CHAT_ID ?? null;
 
 if (!token) {
     throw new Error('Declare BOT_TOKEN in .env file in the root of the project');
@@ -14,6 +19,16 @@ const bot = new Bot(token);
 bot.api.setMyCommands([
     { command: 'map', description: 'Карта Лисьей Деревни' },
 ]);
+
+bot.api.config.use(autoRetry({
+    maxRetryAttempts: 3, // only repeat requests once
+    maxDelaySeconds: 5, // fail immediately if we have to wait >5 seconds
+}));
+bot.use(
+    ignoreOld(),
+    limit(),
+    sequentialize(),
+);
 
 const LottonyLinksList = {
         //Lottony DAO
@@ -56,10 +71,10 @@ const LottonyLinksList = {
             `- [Youtube](${LottonyLinksList.BLYoutube})\n` +
             `- [TikTok](${LottonyLinksList.BLTikTok})\n` +
             `- [Instagram](${LottonyLinksList.BLInstagram})\n`;
-        bot.command("map", (ctx: Context) => {
-            ctx.reply(mapMessage, {
+        bot.command("map", async (ctx: Context) => {
+            await ctx.reply(mapMessage, {
                 parse_mode: "Markdown",
-                link_preview_options: {is_disabled: true},
+                link_preview_options: { is_disabled: true },
             });
         });
 
@@ -75,10 +90,22 @@ bot.on('message', async (ctx: Context) => {
         }
     } else {
         return handleMessage(ctx)
-            .catch((e: Error) => {
-                ctx.reply(e.message)
+            .catch(async (e: Error) => {
+                await ctx.reply(e.message)
             });
     }
 });
 
-bot.start();
+bot.catch(async (err) => {
+    console.error('bot.catch: An error occurred\n', err);
+    logsChatId && await err.ctx.api.sendMessage(logsChatId,
+        `An error occurred: ${err.message} 
+        in chat ${err.ctx.chat?.id} 
+        with ${err.ctx.from?.id} (${err.ctx.from?.username})`
+    );
+})
+
+bot.start()
+    .catch((err) => {
+        console.log('Start failed', err);
+    });

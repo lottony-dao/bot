@@ -6,6 +6,7 @@ services:
     command: npm run dev
     ports:
       - "8080:8080" # Убедитесь, что порт соответствует тому, который используется вашим ботом
+    restart: on-failure
     environment:
       - MODE=${MODE}
     volumes:
@@ -17,8 +18,7 @@ services:
   dao_db:
     container_name: dao_db
     image: postgres:13
-    ports:
-      - "5432:5432"
+    restart: on-failure
     environment:
       - POSTGRES_USER=${PG_USER}
       - POSTGRES_PASSWORD=${PG_PWD}
